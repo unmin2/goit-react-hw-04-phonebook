@@ -1,63 +1,60 @@
-import { contactform } from './ContactForm.styled'
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { contactform } from './ContactForm.styled';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
+function ContactForm({ onSubmitData }) {
+  const [formData, setFormData] = useState({ name: '', number: '' });
+
+  const handleChange = (event) => {
+    const { name, value } = event.currentTarget;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
-    handleChange = event => {
-        const { name, value } = event.currentTarget;
-        this.setState({ [name]: value });
-    };
-      handleSubmit = event => {
+
+  const handleSubmit = (event) => {
     event.preventDefault();
-    let contactForAdd = { name: this.state.name, number: this.state.number };
-    this.props.onSubmitData(contactForAdd);
-
-    this.reset();
-      };
-    
-  reset = () => {
-    this.setState({ name: '', number: '' });
+    onSubmitData(formData);
+    reset();
   };
-     render() {
-    return (
-      <div className={contactform}>
-        <form type="submit" onSubmit={this.handleSubmit}>
-          <label>
-            Name
-            <input
-              type="text"
-              name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-              required
-              onChange={this.handleChange}
-              value={this.state.name}
-            />
-          </label>
-          <label>
-            Number
-            <input
-              type="tel"
-              name="number"
-              pattern="(\+?( |-|\.)?\d{1,2}( |-|\.)?)?(\(?\d{3}\)?|\d{3})( |-|\.)?(\d{3}( |-|\.)?\d{4})"
-              title="Номер телефона должен состоять из 11-12 цифр и может содержать цифры, пробелы, тире, пузатые скобки и может начинаться с +"
-              required
-              onChange={this.handleChange}
-              value={this.state.number}
-            />
-          </label>
- <button type="submit">Add contact</button>
-        </form>
-      </div>
-    );
-  }
+
+  const reset = () => {
+    setFormData({ name: '', number: '' });
+  };
+
+  return (
+    <form className={contactform} onSubmit={handleSubmit}>
+      <label>
+        Name:
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <label>
+        Number:
+        <input
+          type="text"
+          name="number"
+          value={formData.number}
+          onChange={handleChange}
+          maxLength="12"
+          pattern="^\+[\d]{1,11}$"
+          title="Please enter a phone number starting with '+' and up to 12 digits."
+          required
+        />
+      </label>
+      <button type="submit">Add contact</button>
+    </form>
+  );
 }
 
 ContactForm.propTypes = {
   onSubmitData: PropTypes.func.isRequired,
 };
+
 export default ContactForm;
